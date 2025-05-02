@@ -1,0 +1,16 @@
+//pip install pymupdf
+
+import fitz
+import os
+
+pdf_filename = "pdf_file.pdf"
+
+doc = fitz.open(pdf_filename)
+
+for page_number in range(len(doc)):
+    page = doc.load_page(page_number)
+    pix = page.get_pixmap(dpi=300)
+    output_filename = f"page_{page_number + 1}.png"
+    pix.save(output_filename)
+
+print('변환 완료')
