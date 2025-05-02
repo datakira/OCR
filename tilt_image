@@ -1,0 +1,32 @@
+# 이미지 기울기 기준이기 *************************************
+
+import cv2
+import matplotlib.pyplot as plt
+from deskew import determine_skew
+from glob import glob
+import os
+
+input_dir = "./image_original"
+output_dir = "./image_tilted"
+
+image_paths = glob(os.path.join(input_dir, "*.png"))
+
+for image_path in image_paths:
+
+    # 원본 이미지 로드
+    img = cv2.imread(image_path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # 기울기 측정
+    angle = determine_skew(gray)
+    (h, w) = img.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    rotated = cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+
+    # 결과 저장
+    filename = os.path.basename(image_path)
+    save_path = os.path.join(output_dir, filename)
+    cv2.imwrite(save_path, rotated)
+
+    print(f"{filename} → 회전 각도: {angle:.2f}° → 저장 완료")
